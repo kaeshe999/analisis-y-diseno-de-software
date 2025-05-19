@@ -1,20 +1,32 @@
 version: '3.8'
+
 services:
-  app:
-    build: .
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3000"  # backend expuesto en el puerto 3001
     environment:
       - DB_HOST=postgres_db
       - DB_PORT=5432
       - DB_USER=user
       - DB_PASSWORD=password
       - DB_NAME=mydb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       - postgres_db
-    volumes:
-      - ./:/app
-      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # React se sirve en el puerto 3000
+    depends_on:
+      - backend
 
   postgres_db:
     image: postgres:15-alpine
